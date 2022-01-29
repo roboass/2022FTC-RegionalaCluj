@@ -4,24 +4,26 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 import java.util.HashMap;
 
-public class  MotorValues {
-    public double fl, fr, bl, br;
-    public double  P, I, D, ImaxOutput;
+public class MotorValues {
+    public double fl, fr, bl, br, globalMultiplier = 0.5;
+
+    public double P = 12, I = 800, D = 10, ImaxOutput; ///17, 100, 5
     public double lastActual, actual, lastOutput, output, errorSum = 0;
-    public double minOutput = 0, maxOutput = 0, outputRampRate = 0, maxError = 0, outputFilter = 0;
+    public double minOutput = 0, maxOutput = 0, outputRampRate = 5, maxError = 1000, outputFilter = 5, minError = 100;
     public boolean reversed = false, firstrun = true;
 
     public double slowModeMultiplier = 0.5;
 
     public MotorValues(double cfl, double cfr, double cbl, double cbr, double slowMultiplier) {
-        fl = cfl;
-        fr = cfr;
-        bl = cbl;
-        br = cbr;
+        fl = cfl * globalMultiplier;
+        fr = cfr * globalMultiplier;
+        bl = cbl * globalMultiplier;
+        br = cbr * globalMultiplier;
         slowModeMultiplier = slowMultiplier;
     }
 
     public MotorValues(double powerAll) {
+        powerAll *= globalMultiplier;
         fl = powerAll;
         fr = powerAll;
         bl = powerAll;
@@ -60,8 +62,10 @@ public class  MotorValues {
      * \/_/    \/_________/  \/_____/
      * (PID)
      */
-    private void applyPID(DcMotor motor, int actualTicks, int setpoint)
+    public void applyPID(DcMotor motor, int actualTicks, int setpoint)
     {
+        int sign = (setpoint < 0 ? -1 : 1);
+        maxOutput = setpoint;
         int error = setpoint - actualTicks;
         double Poutput, Ioutput, Doutput;
 
@@ -81,6 +85,7 @@ public class  MotorValues {
         if(ImaxOutput != 0) Ioutput = constrain(Ioutput, ImaxOutput, -ImaxOutput);
 
         output = Poutput + Ioutput + Doutput;
+        output *= sign;
 
         if(minOutput!=maxOutput && !bounded(output, minOutput,maxOutput)){
             errorSum=error;
@@ -107,7 +112,7 @@ public class  MotorValues {
 
         lastOutput = output;
         motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        motor.setTargetPosition(output);
+        motor.setTargetPosition((int)output);
         motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
 
@@ -120,18 +125,5 @@ public class  MotorValues {
 
     private boolean bounded(double value, double mx, double mn) {
         return (mn < value && value < mx);
-    }
-
-    private void checkSigns(){
-        if(reversed){  // all values should be below zero
-            if(P>0) P*=-1;
-            if(I>0) I*=-1;
-            if(D>0) D*=-1;
-        }
-        else{  // all values should be above zero
-            if(P<0) P*=-1;
-            if(I<0) I*=-1;
-            if(D<0) D*=-1;
-        }
     }
 }

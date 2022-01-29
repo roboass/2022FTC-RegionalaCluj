@@ -30,6 +30,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 @Autonomous(name="AutonomousCode", group="Linear Opmode")
@@ -43,90 +44,23 @@ public class AutonomousCode extends UsefulFunctions {
         telemetry.update();
 
         Initialise();
-        InitialiseVision();
-
+//        InitialiseVision();
         waitForStart();
         runtime.reset();
 
         sleep(500);
-
-        String startCount = detector.count;
-        StopVision();
-        telemetry.addData("Start ring count:", startCount);
-        //telemetry.addData( "Crt ticks fl fr bl br", crticksfl + " " + crticksfr + "  " + crticksbl + " " + crticksbr);
+//        StopVision();
         telemetry.update();
 
-        double angleOffset = 0;
-        if(startCount == "ZERO") {
-            angleOffset = -1;
-            AutonomousMove(in_to_mm(2.8 * 24), 0);
-            AutonomousMove(0, in_to_mm(0.3 * 24));
-            CorrectAngle(0);
-
-            AutonomousMove(-in_to_mm(14), 0);
-            AutonomousMove(0, -in_to_mm(18.4));
-            CorrectAngle(0);
-        } else if(startCount == "ONE") {
-            AutonomousMove(in_to_mm(3.5 * 24), 0);
-            MoveRotation(750, false);
-            AutonomousMove(200, 0);
-            AutonomousMove(-200, 0);
-            CorrectAngle(0);
-
-            AutonomousMove(-in_to_mm(36), 0);
-            AutonomousMove(0, -in_to_mm(12));
-            CorrectAngle(0);
-        } else if(startCount == "FOUR") {
-            AutonomousMove(in_to_mm(4.5 * 24), 0);
-            AutonomousMove(0, in_to_mm(0.4 * 24));
-            CorrectAngle(0);
-
-            AutonomousMove(-in_to_mm(4 + 2 * 24), 0);
-            AutonomousMove(0, -in_to_mm(20));
-            CorrectAngle(0);
-        }
-
-        telemetry.addData( "Crt ticks fl fr bl br", crticksfl + " " + crticksfr + "  " + crticksbl + " " + crticksbr);
-        telemetry.update();
-
-        AddToLaunchAngle(startAngle + angleOffset);
-        launchMotor.setPower(1);
+        AutonomousMove(in_to_mm(24), 0);
         sleep(500);
-
-        AddToLaunchAngle(2);
-        sleep(150);
-        launchServoThread.run();
-        AddToLaunchAngle(-2);
-
-        sleep(150);
-        launchServoThread.run();
-
-        sleep(150);
-        AddToLaunchAngle(-0.35);
-        launchServoThread.run();
-
-        /*
-        for(int i = 0; i < 3; i++)
-        {
-            if(i == 0)
-                AddToLaunchAngle(2);
-            if(i == 2)
-                AddToLaunchAngle(-0.3456);
-
-            sleep(150);
-            launchServoThread.run();
-
-            if(i == 0)
-                AddToLaunchAngle(-2);
-        }*/
-        launchMotor.setPower(0);
-        AddToLaunchAngle(-currentLaunchAngle);
-
-        AutonomousMove(in_to_mm(16), 0);
-
+        AutonomousMove(0, in_to_mm(-24));
+        sleep(500);
+        AutonomousMove(in_to_mm(-24), 0);
+        sleep(500);
+        AutonomousMove(0, in_to_mm(24));
         while (opModeIsActive()) {
             telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addData("Current ring count:", startCount);
             telemetry.update();
         }
 

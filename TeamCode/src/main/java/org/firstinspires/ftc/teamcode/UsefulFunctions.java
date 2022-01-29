@@ -10,73 +10,39 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.openftc.easyopencv.OpenCvCamera;
-import org.openftc.easyopencv.OpenCvCameraFactory;
-import org.openftc.easyopencv.OpenCvCameraRotation;
-import org.openftc.easyopencv.OpenCvInternalCamera;
+//import org.openftc.easyopencv.OpenCvCamera;
+//import org.openftc.easyopencv.OpenCvCameraFactory;
+//import org.openftc.easyopencv.OpenCvCameraRotation;
+//import org.openftc.easyopencv.OpenCvInternalCamera;
 
 public class UsefulFunctions extends LinearOpMode {
-    public DcMotor frontleft, frontright, backleft, backright, launchMotor;
-    public Servo launchServo, liftClawServo1, liftClawServo2, grabClawServo1, grabClawServo2, angleLaunchServo1, angleLaunchServo2;
-    public OpenCvCamera phoneCam;
-    public ImageDetector detector = new ImageDetector();
+    public DcMotor frontleft, frontright, backleft, backright;
+    public DcMotor trafaletMotor; //zaiafet
+    public Servo trafaletServoStanga, trafaletServoDreapta;
+    //public Servo launchServo, liftClawServo1, liftClawServo2, grabClawServo1, grabClawServo2, angleLaunchServo1, angleLaunchServo2;
+//    public OpenCvCamera phoneCam;
+    //  public ImageDetector detector = new ImageDetector();
 
-    public static double currentLaunchAngle = 0, previousLaunchAngle = 0;
-    public static int currentClawState = 0;
-
-    public double startAngle = 50; //58
-    public double addedAngle = 2.5;
-    public double powershotAngle = startAngle - 2.5;
-
-    public static double ticks_rev = 753.2;
-    public static int gear_ratio = 2;
+    public static double ticks_rev = 55.1;//753.2, 145.6;
+    public static double gear_ratio = 5.2;
     public static int diameter_mm = 100;
     public static double diameter_in = 3.94;
+    public static double robotSizeRatio = 34.5 / 26; //lungime / latime
 
     public int crticksfl, crticksfr, crticksbl, crticksbr;
-
-    public Thread launchServoThread = new Thread() {
-        public void run() {
-            launchServo.setPosition(-0.55);
-            try {
-                Thread.sleep(1000);
-                launchServo.setPosition(0.55);
-                Thread.sleep(700);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-    };
-
-    public Thread clawAngleThread = new Thread() {
-        public void run() {
-            try {
-                Thread.sleep(1000);
-                AddToLaunchAngle(previousLaunchAngle);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-    };
 
     public BNO055IMU gyro;
     public Orientation crtangle = new Orientation();
 
     public void Initialise() {
-        launchMotor = hardwareMap.get(DcMotor.class, "launch_motor");
         frontleft = hardwareMap.get(DcMotor.class, "front_left");
         frontright = hardwareMap.get(DcMotor.class, "front_right");
         backleft = hardwareMap.get(DcMotor.class, "back_left");
         backright = hardwareMap.get(DcMotor.class, "back_right");
+        trafaletMotor = hardwareMap.get(DcMotor.class, "trafalet");
 
-        launchServo = hardwareMap.get(Servo.class, "launch_servo");
-        angleLaunchServo1 = hardwareMap.get(Servo.class, "angle_servo1");
-        angleLaunchServo2 = hardwareMap.get(Servo.class, "angle_servo2");
-
-        liftClawServo1 = hardwareMap.get(Servo.class, "lcs1");
-        liftClawServo2 = hardwareMap.get(Servo.class, "lcs2");
-        grabClawServo1 = hardwareMap.get(Servo.class, "gcs1");
-        grabClawServo2 = hardwareMap.get(Servo.class, "gcs2");
+        trafaletServoStanga = hardwareMap.get(Servo.class, "trafalet_servo_st");
+        trafaletServoDreapta = hardwareMap.get(Servo.class, "trafalet_servo_dr");
 
         SwitchMotorModes(DcMotor.RunMode.RUN_USING_ENCODER);
 
@@ -89,20 +55,7 @@ public class UsefulFunctions extends LinearOpMode {
         frontright.setDirection(DcMotorSimple.Direction.REVERSE);
         backleft.setDirection(DcMotorSimple.Direction.REVERSE);
         backright.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        angleLaunchServo1.setDirection(Servo.Direction.FORWARD);
-        angleLaunchServo2.setDirection(Servo.Direction.REVERSE);
-        launchServo.setDirection(Servo.Direction.FORWARD);
-        launchMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-
-        liftClawServo1.setDirection(Servo.Direction.REVERSE);
-        liftClawServo2.setDirection(Servo.Direction.FORWARD);
-
-        grabClawServo1.setDirection(Servo.Direction.REVERSE);
-        grabClawServo2.setDirection(Servo.Direction.FORWARD);
-
-        currentLaunchAngle = 0;
-        currentClawState = 0;
+        trafaletMotor.setDirection(DcMotorSimple.Direction.FORWARD);
 
         //Partea drepta mere in fata
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
@@ -148,88 +101,26 @@ public class UsefulFunctions extends LinearOpMode {
         backleft.setTargetPosition(trgtbl);
         backright.setTargetPosition(trgtbr);
         SwitchMotorModes(DcMotor.RunMode.RUN_TO_POSITION);
-        ApplyMotorValues(new MotorValues(motorPower));
+        MotorValues mv = new MotorValues(motorPower);
+        ApplyMotorValues(mv);
 
         while ((frontleft.isBusy() && frontright.isBusy() && backleft.isBusy() && backright.isBusy()) && opModeIsActive()) {
             UpdateOrientation();
             UpdateTicks();
+            telemetry.addData("fl", crticksfl +" "+ trgtfl);
+            telemetry.addData("fr", crticksfr +" "+ trgtfr);
+            telemetry.addData("bl", crticksbl +" "+ trgtbl);
+            telemetry.addData("br", crticksbr +" "+ trgtbr);
+            telemetry.update();
         }
+        mv.applyPID(frontleft, crticksfl, trgtfl);
+        mv.applyPID(frontright, crticksfr, trgtfr);
+        mv.applyPID(backleft, crticksbl, trgtbl);
+        mv.applyPID(backright, crticksbr, trgtbr);
+
         ApplyMotorValues(new MotorValues(0));
         UpdateTicks();
         UpdateOrientation();
-    }
-
-    public void MoveRotation(double x_mm, boolean goRight)
-    {
-        double motorPower = 1;
-
-        int ticksToMove = mm_to_ticks(x_mm);
-
-        int leftControl = (goRight == true ? -1 : 1);
-        int rightControl = (goRight == true ? 1 : -1);
-        UpdateTicks();
-        int trgtfl, trgtfr, trgtbl, trgtbr;
-        trgtfl = crticksfl + ticksToMove;
-        trgtfr = crticksfr - ticksToMove;
-        trgtbl = crticksbl - leftControl * ticksToMove;
-        trgtbr = crticksbr + rightControl * ticksToMove;
-
-        SwitchMotorModes(DcMotor.RunMode.RUN_USING_ENCODER);
-        frontleft.setTargetPosition(trgtfl);
-        frontright.setTargetPosition(trgtfr);
-        backleft.setTargetPosition(trgtbl);
-        backright.setTargetPosition(trgtbr);
-        UpdateTicks();
-        UpdateOrientation();
-        SwitchMotorModes(DcMotor.RunMode.RUN_TO_POSITION);
-        ApplyMotorValues(new MotorValues(motorPower));
-
-        while ((frontleft.isBusy() && frontright.isBusy() && backleft.isBusy() && backright.isBusy()) && opModeIsActive()) {
-            UpdateTicks();
-            UpdateOrientation();
-        }
-        ApplyMotorValues(new MotorValues(0));
-        UpdateTicks();
-        UpdateOrientation();
-    }
-
-    public void CorrectAngle(double correctAngle)
-    {
-        double ticksPerAngle = 29.65;
-
-        UpdateOrientation();
-        UpdateTicks();
-
-        int trgtfl, trgtfr, trgtbl, trgtbr;
-        int ticksToMove = (int) (-(correctAngle - crtangle.firstAngle) * ticksPerAngle);
-        trgtfl = crticksfl + ticksToMove;
-        trgtfr = crticksfr + ticksToMove;
-        trgtbl = crticksbl + ticksToMove;
-        trgtbr = crticksbr + ticksToMove;
-
-        SwitchMotorModes(DcMotor.RunMode.RUN_USING_ENCODER);
-        //applyPID(frontleft, crticksfl, trgtfl);
-
-        frontleft.setTargetPosition(trgtfl);
-        frontright.setTargetPosition(trgtfr);
-        backleft.setTargetPosition(trgtbl);
-        backright.setTargetPosition(trgtbr);
-        SwitchMotorModes(DcMotor.RunMode.RUN_TO_POSITION);
-        ApplyMotorValues(new MotorValues(1));
-
-        telemetry.addData("Ticks to move", ticksToMove);
-        telemetry.update();
-
-        while ((frontleft.isBusy() && frontright.isBusy() && backleft.isBusy() && backright.isBusy()) && opModeIsActive()) {
-            UpdateTicks();
-            UpdateOrientation();
-        }
-        ApplyMotorValues(new MotorValues(0));
-        UpdateTicks();
-        UpdateOrientation();
-
-        telemetry.addData("current angle", crtangle.firstAngle);
-        telemetry.update();
     }
 
     /*Functia care controleaza miscarea in TeleOp.
@@ -241,11 +132,10 @@ public class UsefulFunctions extends LinearOpMode {
 
         double power_fl = x - y + rotation;
         double power_fr = x + y + rotation;
-        double power_bl = -x - y + rotation;
-        double power_br = -x + y + rotation;
+        double power_bl = - x - y + rotation;
+        double power_br = - x +  y + rotation;
 
         MotorValues motorValues = new MotorValues(power_fl, power_fr, power_bl, power_br, 0.5);
-
         if (gamepad1.left_bumper) motorValues.SlowMode();
 
         motorValues.NormaliseValues();
@@ -297,68 +187,23 @@ public class UsefulFunctions extends LinearOpMode {
         crtangle = gyro.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
     }
 
-    public void InitialiseVision() {
-        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        phoneCam = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
-        phoneCam.setPipeline(detector);
-        phoneCam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
-        {
-            @Override
-            public void onOpened()
-            {
-                phoneCam.startStreaming(320, 240, OpenCvCameraRotation.SIDEWAYS_LEFT);
-            }
-        });
-    }
-
-    public void StopVision() {
-        phoneCam.stopStreaming();
-    }
-
-    public void GrabClawState(boolean state) {
-        if(state)
-        {
-           grabClawServo1.setPosition(0.25);
-           grabClawServo2.setPosition(0.25);
-        }
-        else
-        {
-            grabClawServo1.setPosition(0);
-            grabClawServo2.setPosition(0);
-            if(currentClawState == 0)
-            {
-                clawAngleThread.start();
-            }
-        }
-    }
-    public void LiftClawState(int state) ///0 - deasupra lansator, 1 - tinut wobble goal, 2 - apucat wobble, 3 - inel
-    {
-        if (state < 0 || state > 3) return;
-        if(state == 0)
-        {
-            previousLaunchAngle = currentLaunchAngle;
-            AddToLaunchAngle(-currentLaunchAngle);
-        }
-        double[] values = new double[]{0.15, 0.54, 0.79, 0.85};
-
-        liftClawServo1.setPosition(values[state]);
-        liftClawServo2.setPosition(values[state]);
-        telemetry.addData("servo position", values[state] - values[currentClawState]);
-        currentClawState = state;
-    }
-    public void AddToLaunchAngle(double angle)
-    {
-        if(currentLaunchAngle + angle <= 90 && currentLaunchAngle + angle >= 0) {
-            currentLaunchAngle += angle;
-            angleLaunchServo1.setPosition(anglesToPercent(currentLaunchAngle));
-            angleLaunchServo2.setPosition(anglesToPercent(currentLaunchAngle));
-        }
-    }
-
-    public double anglesToPercent(double x)
-    {
-        return x / 180;
-    }
+//    public void InitialiseVision() {
+//        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+//        phoneCam = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
+//        phoneCam.setPipeline(detector);
+//        phoneCam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
+//        {
+//            @Override
+//            public void onOpened()
+//            {
+//                phoneCam.startStreaming(320, 240, OpenCvCameraRotation.SIDEWAYS_LEFT);
+//            }
+//        });
+//    }
+//
+//    public void StopVision() {
+//        phoneCam.stopStreaming();
+//    }
     @Override
     public void runOpMode () throws InterruptedException {
     }

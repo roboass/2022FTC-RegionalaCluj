@@ -2,3 +2,5 @@ GAMEPAD1
     left stick - movement
     right stick - rotation
     left bumper - slow mode
+GAMEPAD2
+    right bumper - TRAFALET

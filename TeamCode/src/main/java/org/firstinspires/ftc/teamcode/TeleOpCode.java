@@ -47,98 +47,26 @@ public class TeleOpCode extends UsefulFunctions {
         telemetry.update();
 
         Initialise();
-
-        telemetry.addData("Launch Servo position", launchServo.getPosition());
-        telemetry.update();
-
         waitForStart();
         runtime.reset();
 
-        AddToLaunchAngle(startAngle);
-
-        boolean dpadupLock = false, dpaddownLock = false;
-        boolean ylock = false, alock = false;
-        boolean rightBumperLock = false;
-        boolean leftBumper2Lock = false, leftBumper2ModeActive = false;
-        boolean xLock = false;
-        boolean bLock = false;
+        boolean xLock = false, bLock = false;
 
         while (opModeIsActive()) {
             TeleOpDrive();
 
-            if(gamepad2.right_trigger >= 0.9f) {
-                launchMotor.setPower(1);
+            telemetry.addData("Status", "Run Time: " + runtime.toString());
+
+            if(gamepad2.right_trigger > 0.9) {
+                trafaletMotor.setPower(10);
             } else {
-                launchMotor.setPower(0);
-            }
-
-
-            if(gamepad2.right_bumper) {
-                if(!rightBumperLock) {
-                    rightBumperLock = true;
-                    launchServoThread.start();
-                }
-
-            }
-            else if(rightBumperLock) {
-                rightBumperLock = false;
-            }
-
-            if(gamepad2.left_bumper) {
-                if(!leftBumper2Lock && !leftBumper2ModeActive) {
-                    leftBumper2ModeActive = true;
-
-                    GrabClawState(true);
-                }else if(!leftBumper2Lock && leftBumper2ModeActive) {
-                    leftBumper2ModeActive = false;
-
-                    GrabClawState(false);
-                }
-                leftBumper2Lock = true;
-            } else if(leftBumper2Lock) { ///h
-                leftBumper2Lock = false;
-            }
-
-            if(gamepad2.a) {
-                if(!alock) {
-                    alock = true;
-                    LiftClawState(currentClawState - 1);
-                }
-            } else if(alock) {
-                alock = false;
-            }
-
-            if(gamepad2.y) {
-                if(!ylock) {
-                    ylock = true;
-                    LiftClawState(currentClawState + 1);
-                }
-            } else if(ylock) {
-                ylock = false;
-            }
-
-            if(gamepad2.dpad_up) {
-                if(!dpadupLock) {
-                    dpadupLock = true;
-                    AddToLaunchAngle(addedAngle);
-                }
-            } else if(dpadupLock) {
-                dpadupLock = false;
-            }
-
-            if(gamepad2.dpad_down) {
-                if(!dpaddownLock) {
-                    dpaddownLock = true;
-                    AddToLaunchAngle(-addedAngle);
-                }
-            } else if(dpaddownLock) {
-                dpaddownLock = false;
+                trafaletMotor.setPower(0);
             }
 
             if(gamepad2.x) {
                 if(!xLock) {
+                    trafaletServoStanga.setPosition(0.1);
                     xLock = true;
-                    AddToLaunchAngle(-currentLaunchAngle + startAngle); //reseteaza la start angle
                 }
             } else if(xLock) {
                 xLock = false;
@@ -146,27 +74,18 @@ public class TeleOpCode extends UsefulFunctions {
 
             if(gamepad2.b) {
                 if(!bLock) {
+                    trafaletServoDreapta.setPosition(0.1);
                     bLock = true;
-                    AddToLaunchAngle(-currentLaunchAngle + powershotAngle); //reseteaza la start angle
                 }
             } else if(bLock) {
                 bLock = false;
             }
 
-            if(gamepad2.left_trigger > 0.5f)
-                addedAngle = 1.0;
-            else
-                addedAngle = 2.5;
-
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
-
             UpdateTicks();
             UpdateOrientation();
             telemetry.addData("Current ticks bl br fl fr", crticksbl + " " + crticksbr + " " + crticksfl + " " + crticksfr);
-            telemetry.addData("Current angle", crtangle.firstAngle);
             telemetry.update();
         }
-        //AddToLaunchAngle(currentLaunchAngle);
 
     }
 }

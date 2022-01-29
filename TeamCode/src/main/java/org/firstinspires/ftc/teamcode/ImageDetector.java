@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-
+/*
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Rect;
@@ -49,8 +49,9 @@ public class ImageDetector extends OpenCvPipeline {
            }
            else
                count = "ONE";
-       } else count = "ZERO";*/
+       } else count = "ZERO";
 
         return workingMatrix;
     }
 }
+*/
