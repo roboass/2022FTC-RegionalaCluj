@@ -54,11 +54,11 @@ public class AutonomousCode extends UsefulFunctions {
 
         AutonomousMove(in_to_mm(24), 0);
         sleep(500);
-        AutonomousMove(0, in_to_mm(-24));
-        sleep(500);
-        AutonomousMove(in_to_mm(-24), 0);
+        AutonomousMove(in_to_mm(0), in_to_mm(-24));
         sleep(500);
         AutonomousMove(0, in_to_mm(24));
+        sleep(500);
+        AutonomousMove(in_to_mm(-24), 0);
         while (opModeIsActive()) {
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.update();

@@ -74,7 +74,7 @@ public class TeleOpCode extends UsefulFunctions {
 
             if(gamepad2.b) {
                 if(!bLock) {
-                    trafaletServoDreapta.setPosition(0.1);
+                    trafaletServoDreapta.setPosition(-0.1);
                     bLock = true;
                 }
             } else if(bLock) {

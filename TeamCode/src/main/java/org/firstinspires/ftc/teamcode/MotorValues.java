@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
+
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import java.util.HashMap;
@@ -7,9 +9,9 @@ import java.util.HashMap;
 public class MotorValues {
     public double fl, fr, bl, br, globalMultiplier = 0.5;
 
-    public double P = 12, I = 800, D = 10, ImaxOutput; ///17, 100, 5
+    public double P = 3, I = 8, D = 1.75, ImaxOutput; ///17, 100, 5 creste d
     public double lastActual, actual, lastOutput, output, errorSum = 0;
-    public double minOutput = 0, maxOutput = 0, outputRampRate = 5, maxError = 1000, outputFilter = 5, minError = 100;
+    public double minOutput = 0, maxOutput = 0, outputRampRate = 5, maxError = 1000, outputFilter = 5;
     public boolean reversed = false, firstrun = true;
 
     public double slowModeMultiplier = 0.5;
