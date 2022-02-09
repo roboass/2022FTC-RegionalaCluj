@@ -37,6 +37,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 //@Disabled
 public class AutonomousCode extends UsefulFunctions {
     private ElapsedTime runtime = new ElapsedTime();
+    String position;
 
     @Override
     public void runOpMode() {
@@ -44,23 +45,26 @@ public class AutonomousCode extends UsefulFunctions {
         telemetry.update();
 
         Initialise();
-//        InitialiseVision();
+        InitialiseVision();
+
         waitForStart();
         runtime.reset();
 
         sleep(500);
-//        StopVision();
-        telemetry.update();
+        position = pipeline.getPosition();
+        StopVision();
+  //      telemetry.update();
 
-        AutonomousMove(in_to_mm(24), 0);
-        sleep(500);
-        AutonomousMove(in_to_mm(0), in_to_mm(-24));
-        sleep(500);
-        AutonomousMove(0, in_to_mm(24));
-        sleep(500);
-        AutonomousMove(in_to_mm(-24), 0);
+//        AutonomousMove(in_to_mm(24), 0);
+//        sleep(500);
+//        AutonomousMove(in_to_mm(0), in_to_mm(-24));
+//        sleep(500);
+//        AutonomousMove(0, in_to_mm(24));
+//        sleep(500);
+//        AutonomousMove(in_to_mm(-24), 0);
         while (opModeIsActive()) {
             telemetry.addData("Status", "Run Time: " + runtime.toString());
+            telemetry.addData("Position", "Position: " + position);
             telemetry.update();
         }
 

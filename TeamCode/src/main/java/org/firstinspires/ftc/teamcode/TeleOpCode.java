@@ -65,7 +65,7 @@ public class TeleOpCode extends UsefulFunctions {
 
             if(gamepad2.x) {
                 if(!xLock) {
-                    trafaletServoStanga.setPosition(0.1);
+                    addToTrafaletAngle(2.5);
                     xLock = true;
                 }
             } else if(xLock) {
@@ -74,7 +74,7 @@ public class TeleOpCode extends UsefulFunctions {
 
             if(gamepad2.b) {
                 if(!bLock) {
-                    trafaletServoDreapta.setPosition(-0.1);
+                    addToTrafaletAngle(-2.5);
                     bLock = true;
                 }
             } else if(bLock) {
@@ -83,6 +83,8 @@ public class TeleOpCode extends UsefulFunctions {
 
             UpdateTicks();
             UpdateOrientation();
+            telemetry.addData("trafalet angle", trafaletAngle);
+
             telemetry.addData("Current ticks bl br fl fr", crticksbl + " " + crticksbr + " " + crticksfl + " " + crticksfr);
             telemetry.update();
         }

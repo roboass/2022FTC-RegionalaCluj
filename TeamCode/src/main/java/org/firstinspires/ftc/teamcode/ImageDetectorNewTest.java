@@ -25,9 +25,9 @@ public class ImageDetectorNewTest extends UsefulFunctions {
         waitForStart();
         while (opModeIsActive()) {
             telemetry.addData("pos", pipeline.getPosition());
-            telemetry.addData("one", pipeline.getFirstT());
-            telemetry.addData("two", pipeline.getSecondT());
-            telemetry.addData("three", pipeline.getThirdT());
+            telemetry.addData("one", pipeline.firstT);
+            telemetry.addData("two", pipeline.secondT);
+            telemetry.addData("three", pipeline.thirdT);
             telemetry.update();
             sleep(100);
         }

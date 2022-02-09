@@ -16,7 +16,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 public class ImageDetector extends OpenCvPipeline {
     private Mat workingMatrix = new Mat();
     public static String position = "FIRST";
-    public double firstT, secondT, thirdT;
+    public static double firstT, secondT, thirdT;
     public int rows = 720, cols = 1080;
     //int rows = firstFrame.rows(), cols = firstFrame.cols();
 
@@ -66,9 +66,9 @@ public class ImageDetector extends OpenCvPipeline {
         Imgproc.rectangle(workingMatrix, p2ss, p2dj, new Scalar(0, 255, 0), 4);
         Imgproc.rectangle(workingMatrix, p3ss, p3dj, new Scalar(0, 0, 255), 4);
 
-        firstT = Core.sumElems(posOne).val[0];
-        secondT = Core.sumElems(posTwo).val[0];
-        thirdT = Core.sumElems(posThree).val[0];
+        firstT = HEIGHT*WIDTH*255 - Core.sumElems(posOne).val[2];
+        secondT = HEIGHT*WIDTH*255 - Core.sumElems(posTwo).val[2];
+        thirdT = HEIGHT*WIDTH*255 - Core.sumElems(posThree).val[2];
 
         double firstmax = Math.max(firstT, secondT),
                lastmax = Math.max(firstmax, thirdT);

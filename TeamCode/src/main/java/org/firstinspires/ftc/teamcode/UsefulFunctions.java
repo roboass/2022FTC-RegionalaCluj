@@ -22,13 +22,13 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 public class UsefulFunctions extends LinearOpMode {
     public DcMotor frontleft, frontright, backleft, backright;
     public DcMotor trafaletMotor; //zaiafet
-    public Servo trafaletServoStanga, trafaletServoDreapta;
+    public Servo trafaletServoStanga, trafaletServoDreapta, rampaServoStanga, rampaServoDreapta;
+    public double trafaletAngle, rampaAngle;
     //public Servo launchServo, liftClawServo1, liftClawServo2, grabClawServo1, grabClawServo2, angleLaunchServo1, angleLaunchServo2;
 //    public OpenCvCamera phoneCam;
-    public ImageDetector detector = new ImageDetector();
 
     OpenCvCamera webcam;
-    ImageDetector pipeline = new ImageDetector();
+    public ImageDetector pipeline = new ImageDetector();
 
     public static double ticks_rev = 55.1;//753.2, 145.6;
     public static double gear_ratio = 5.2;
@@ -63,6 +63,12 @@ public class UsefulFunctions extends LinearOpMode {
         backleft.setDirection(DcMotorSimple.Direction.REVERSE);
         backright.setDirection(DcMotorSimple.Direction.REVERSE);
         trafaletMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+
+        trafaletServoStanga.setDirection(Servo.Direction.FORWARD);
+        trafaletServoDreapta.setDirection(Servo.Direction.REVERSE);
+        trafaletServoDreapta.setPosition(0);
+        trafaletServoStanga.setPosition(0);
+        trafaletAngle = rampaAngle = 0;
 
         //Partea drepta mere in fata
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
@@ -199,7 +205,7 @@ public class UsefulFunctions extends LinearOpMode {
         webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
 
         pipeline = new ImageDetector();
-        webcam.setPipeline(detector);
+        webcam.setPipeline(pipeline);
 
         webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
         {
@@ -212,22 +218,21 @@ public class UsefulFunctions extends LinearOpMode {
             @Override
             public void onError(int errorCode) { }
         });
-        /*int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        phoneCam = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
-        phoneCam.setPipeline(detector);
-        phoneCam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
-        {
-            @Override
-            public void onOpened()
-            {
-                phoneCam.startStreaming(320, 240, OpenCvCameraRotation.SIDEWAYS_LEFT);
-            }
-        });*/
     }
-//
-//    public void StopVision() {
-//        phoneCam.stopStreaming();
-//    }
+
+    public void StopVision() {
+        webcam.stopStreaming();
+    }
+
+    public void addToTrafaletAngle(double angle)
+    {
+        trafaletAngle += angle;
+        trafaletServoStanga.setPosition(trafaletAngle/180 * 12);
+        trafaletServoDreapta.setPosition(trafaletAngle/180 * 12
+        );
+    }
+
+
     @Override
     public void runOpMode () throws InterruptedException {
     }
