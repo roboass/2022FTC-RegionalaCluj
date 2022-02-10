@@ -30,12 +30,11 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@Autonomous(name="AutonomousCode", group="Linear Opmode")
+@Autonomous(name="RegionalaRusia", group="Linear Opmode")
 //@Disabled
-public class AutonomousCode extends UsefulFunctions {
+public class RegionalaRusia extends UsefulFunctions {
     private ElapsedTime runtime = new ElapsedTime();
     String position;
 
@@ -45,30 +44,12 @@ public class AutonomousCode extends UsefulFunctions {
         telemetry.update();
 
         Initialise();
-        InitialiseVision();
 
         waitForStart();
         runtime.reset();
 
-        sleep(500);
-        position = pipeline.getPosition();
-        StopVision();
-
+        AutonomousMove(0, in_to_mm(24));
         AutonomousMove(-in_to_mm(24), 0);
-        sleep(2000);
-        AutonomousMove(0, -in_to_mm(24));
-        sleep(2000);
-
-        if(position == "FIRST") {
-            addToRampaAngle(-rampaAngle + unghiNivelJos);
-        } else if(position == "SECOND") {
-            addToRampaAngle(-rampaAngle + unghiNivelMij);
-        } else if(position == "THIRD") {
-            addToRampaAngle(-rampaAngle + unghiNivelSus);
-        }
-        sleep(2000);
-
-        AutonomousRotate(90);
 
         while (opModeIsActive()) {
             telemetry.addData("Status", "Run Time: " + runtime.toString());

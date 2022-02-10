@@ -22,7 +22,10 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 public class UsefulFunctions extends LinearOpMode {
     public DcMotor frontleft, frontright, backleft, backright;
     public DcMotor trafaletMotor; //zaiafet
-    public Servo trafaletServoStanga, trafaletServoDreapta, rampaServoStanga, rampaServoDreapta;
+    public DcMotor rampaMotorDreapta, rampaMotorStanga;
+    public DcMotor duckMotor;
+    public Servo platformaServo;
+    public Servo trafaletServoStanga, trafaletServoDreapta, rampaServoStanga, rampaServoDreapta, servoTragator;
     public double trafaletAngle, rampaAngle;
     //public Servo launchServo, liftClawServo1, liftClawServo2, grabClawServo1, grabClawServo2, angleLaunchServo1, angleLaunchServo2;
 //    public OpenCvCamera phoneCam;
@@ -36,6 +39,15 @@ public class UsefulFunctions extends LinearOpMode {
     public static double diameter_in = 3.94;
     public static double robotSizeRatio = 34.5 / 26; //lungime / latime
 
+    public static double gearRatioOffset = 32/20; ///32 dde dinti pe 20 de dinti pentru ca un servo avea dinti diferite (servo dreapta rampa)
+    public static int trafaletPozJos = 100;
+
+    public double unghiNivelJos =  90, unghiNivelMij = 45, unghiNivelSus = 30;
+    public double unghiuriRampa[] = {unghiNivelJos, unghiNivelMij, unghiNivelSus};
+    public static int rampaState = 0; /// 0 - JOS, 1 - MIJLOC, 2 - SUS
+
+    public static boolean mergeRampa = false;
+
     public int crticksfl, crticksfr, crticksbl, crticksbr;
 
     public BNO055IMU gyro;
@@ -47,9 +59,14 @@ public class UsefulFunctions extends LinearOpMode {
         backleft = hardwareMap.get(DcMotor.class, "back_left");
         backright = hardwareMap.get(DcMotor.class, "back_right");
         trafaletMotor = hardwareMap.get(DcMotor.class, "trafalet");
+        rampaMotorDreapta = hardwareMap.get(DcMotor.class, "r_m_d");
+        rampaMotorStanga = hardwareMap.get(DcMotor.class, "r_m_s");
 
         trafaletServoStanga = hardwareMap.get(Servo.class, "trafalet_servo_st");
         trafaletServoDreapta = hardwareMap.get(Servo.class, "trafalet_servo_dr");
+        rampaServoStanga = hardwareMap.get(Servo.class, "rampa_servo_st");
+        rampaServoDreapta = hardwareMap.get(Servo.class, "rampa_servo_dr");
+        servoTragator = hardwareMap.get(Servo.class, "tragator");
 
         SwitchMotorModes(DcMotor.RunMode.RUN_USING_ENCODER);
 
@@ -58,17 +75,25 @@ public class UsefulFunctions extends LinearOpMode {
         backleft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backright.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        frontleft.setDirection(DcMotorSimple.Direction.REVERSE);
-        frontright.setDirection(DcMotorSimple.Direction.REVERSE);
-        backleft.setDirection(DcMotorSimple.Direction.REVERSE);
-        backright.setDirection(DcMotorSimple.Direction.REVERSE);
+        frontleft.setDirection(DcMotorSimple.Direction.FORWARD);
+        frontright.setDirection(DcMotorSimple.Direction.FORWARD);
+        backleft.setDirection(DcMotorSimple.Direction.FORWARD);
+        backright.setDirection(DcMotorSimple.Direction.FORWARD);
         trafaletMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        rampaMotorDreapta.setDirection(DcMotorSimple.Direction.FORWARD);
+        rampaMotorStanga.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        trafaletServoStanga.setDirection(Servo.Direction.FORWARD);
-        trafaletServoDreapta.setDirection(Servo.Direction.REVERSE);
+        trafaletServoStanga.setDirection(Servo.Direction.REVERSE);
+        trafaletServoDreapta.setDirection(Servo.Direction.FORWARD);
+        rampaServoStanga.setDirection(Servo.Direction.FORWARD);
+        rampaServoDreapta.setDirection(Servo.Direction.REVERSE);
+
         trafaletServoDreapta.setPosition(0);
         trafaletServoStanga.setPosition(0);
-        trafaletAngle = rampaAngle = 0;
+        rampaServoDreapta.setPosition(0.5);
+        rampaServoStanga.setPosition(0.5);
+        trafaletAngle = 0;
+        rampaAngle = 90;
 
         //Partea drepta mere in fata
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
@@ -78,11 +103,11 @@ public class UsefulFunctions extends LinearOpMode {
         parameters.loggingEnabled      = false;
         gyro = hardwareMap.get(BNO055IMU.class, "imu");
         gyro.initialize(parameters);
-        /*while (!gyro.isGyroCalibrated() && opModeIsActive())
+        while (!gyro.isGyroCalibrated() && opModeIsActive())
         {
             telemetry.addData("IMU is calibrating!", "Please wait.");
             telemetry.update();
-        }*/
+        }
 
         telemetry.addData("Init is done", "Press start");
         telemetry.update();
@@ -134,6 +159,23 @@ public class UsefulFunctions extends LinearOpMode {
         ApplyMotorValues(new MotorValues(0));
         UpdateTicks();
         UpdateOrientation();
+    }
+
+    public void AutonomousRotate(double angle) {
+        MotorValues mv = new MotorValues(1);
+
+        double crtAngle = gyro.getAngularOrientation().firstAngle;
+        while(gyro.getAngularOrientation().firstAngle != angle)
+        {
+            int sign = angle - crtAngle > 0 ? -1 : 1;
+            ApplyMotorValues(new MotorValues(sign));
+            sleep(50);
+            UpdateOrientation();
+            UpdateTicks();
+        }
+        ApplyMotorValues(new MotorValues(0));
+        UpdateOrientation();
+        UpdateTicks();
     }
 
     /*Functia care controleaza miscarea in TeleOp.
@@ -227,11 +269,24 @@ public class UsefulFunctions extends LinearOpMode {
     public void addToTrafaletAngle(double angle)
     {
         trafaletAngle += angle;
-        trafaletServoStanga.setPosition(trafaletAngle/180 * 12);
-        trafaletServoDreapta.setPosition(trafaletAngle/180 * 12
-        );
+        trafaletServoStanga.setPosition(trafaletAngle/180);
+        trafaletServoDreapta.setPosition(trafaletAngle/180);
     }
 
+    public void addToRampaAngle(double angle)
+    {
+        rampaAngle += angle;
+        rampaServoStanga.setPosition(rampaAngle/180);
+        rampaServoDreapta.setPosition(gearRatioOffset*rampaAngle/180);
+    }
+
+    public void changeRampaState(int unit)
+    {
+        if(rampaState + unit >= 0 && rampaState + unit < 3) rampaState += unit;
+        else return;
+
+        addToRampaAngle(-rampaAngle + unghiuriRampa[rampaState]);
+    }
 
     @Override
     public void runOpMode () throws InterruptedException {

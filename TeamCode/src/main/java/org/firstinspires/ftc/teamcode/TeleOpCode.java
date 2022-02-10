@@ -41,49 +41,106 @@ import com.qualcomm.robotcore.util.Range;
 public class TeleOpCode extends UsefulFunctions {
     private ElapsedTime runtime = new ElapsedTime();
 
+
+
     @Override
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
         Initialise();
+        telemetry.addData("left", rampaServoStanga.getPosition());
+        telemetry.addData("right", rampaServoDreapta.getPosition());
+        telemetry.update();
         waitForStart();
         runtime.reset();
 
-        boolean xLock = false, bLock = false;
+        boolean xLock = false, bLock = false, yLock = false, aLock = false, dupLock = false, ddownLock = false,
+                dleft = false, dright = false, rbumper2 = false;
 
         while (opModeIsActive()) {
             TeleOpDrive();
 
             telemetry.addData("Status", "Run Time: " + runtime.toString());
 
-            if(gamepad2.right_trigger > 0.9) {
+            if(gamepad1.right_trigger > 0.9) {
                 trafaletMotor.setPower(10);
             } else {
                 trafaletMotor.setPower(0);
             }
 
-            if(gamepad2.x) {
-                if(!xLock) {
-                    addToTrafaletAngle(2.5);
-                    xLock = true;
+
+            if(gamepad2.right_bumper) {
+                if(!rbumper2) {
+                    mergeRampa = !mergeRampa;
+                    rampaMotorDreapta.setPower(mergeRampa ? 1 : 0);
+                    rampaMotorStanga.setPower(mergeRampa ? 1 : 0);
+                    rbumper2 = true;
                 }
-            } else if(xLock) {
-                xLock = false;
+            } else if(rbumper2) {
+                rbumper2 = false;
             }
 
-            if(gamepad2.b) {
-                if(!bLock) {
+            if(gamepad1.y) {
+                if(!yLock) {
                     addToTrafaletAngle(-2.5);
+                    yLock = true;
+                }
+            } else if(yLock) {
+                yLock = false;
+            }
+
+            if(gamepad1.a) {
+                if(!aLock) {
+                    addToTrafaletAngle(2.5);
+                    aLock = true;
+                }
+            } else if(aLock) aLock = false;
+
+            if(gamepad1.b) {
+                if(!bLock) {
+                    addToTrafaletAngle(-trafaletAngle + trafaletPozJos);
                     bLock = true;
                 }
-            } else if(bLock) {
-                bLock = false;
-            }
+            } else if(bLock) bLock = false;
+
+            if(gamepad2.dpad_up) {
+                if(!dupLock)
+                {
+                    changeRampaState(-1);
+                    dupLock = true;
+                }
+            } else if(dupLock) dupLock = false;
+
+            if(gamepad2.dpad_down) {
+                if(!ddownLock)
+                {
+                    changeRampaState(1);
+                    ddownLock = true;
+                }
+            } else if(ddownLock) ddownLock = false;
+
+            if(gamepad2.dpad_right) {
+                if(!dright)
+                {
+                    addToRampaAngle(5);
+                    dright = true;
+                }
+            } else if(dright) dright = false;
+
+            if(gamepad2.dpad_left) {
+                if(!dleft)
+                {
+                    addToRampaAngle(-5);
+                    dleft = true;
+                }
+            } else if(dleft) dleft = false;
 
             UpdateTicks();
             UpdateOrientation();
-            telemetry.addData("trafalet angle", trafaletAngle);
+            telemetry.addData("rampa angle", rampaAngle);
+            telemetry.addData("rampa stanga", rampaServoStanga.getPosition());
+            telemetry.addData("rampa dreapta", rampaServoDreapta.getPosition());
 
             telemetry.addData("Current ticks bl br fl fr", crticksbl + " " + crticksbr + " " + crticksfl + " " + crticksfr);
             telemetry.update();
