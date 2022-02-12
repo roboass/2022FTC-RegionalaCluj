@@ -18,12 +18,11 @@ public class ImageDetector extends OpenCvPipeline {
     public static String position = "FIRST";
     public static double firstT, secondT, thirdT;
     public int rows = 720, cols = 1080;
-    //int rows = firstFrame.rows(), cols = firstFrame.cols();
 
-    int HEIGHT = 100, WIDTH = 200;
-    Point p1ss = new Point(0, 0),
-          p2ss = new Point(400, 0),
-          p3ss = new Point(800, 0);
+    int HEIGHT = 150, WIDTH = 150;
+    Point p1ss = new Point(0  , 400),
+          p2ss = new Point(400, 400),
+          p3ss = new Point(800, 400);
 
 
     Point p1dj = new Point(p1ss.x + HEIGHT, p1ss.y + WIDTH),
@@ -32,8 +31,7 @@ public class ImageDetector extends OpenCvPipeline {
 
     Mat posOne, posTwo, posThree;
 
-    public ImageDetector() {
-    }
+    public ImageDetector() {}
 
     @Override
     public void init(Mat firstFrame)
@@ -52,16 +50,9 @@ public class ImageDetector extends OpenCvPipeline {
 //        posOne = input.submat(new Rect(p1ss, p1dj));
 //        posTwo = input.submat(new Rect(p2ss, p2dj));
 //        posThree = input.submat(new Rect(p3ss, p3dj));
-        //Imgproc.cvtColor(workingMatrix, workingMatrix, Imgproc.COLOR_RGB2XYZ);
-        //Imgproc.cvtColor(workingMatrix, workingMatrix, Imgproc.COLOR_XYZ2BGR);
+//        Imgproc.cvtColor(workingMatrix, workingMatrix, Imgproc.COLOR_RGB2XYZ);
+//        Imgproc.cvtColor(workingMatrix, workingMatrix, Imgproc.COLOR_XYZ2BGR);
 
-        //Mat matFourRings = workingMatrix.submat(147, 167, 0, 70);
-
-        /*
-        Imgproc.rectangle(workingMatrix, new Rect(p1xss+0, p1yss+0, p1ydj - p1yss, p1xdj - p1xss), new Scalar(255, 0, 0));
-        Imgproc.rectangle(workingMatrix, new Rect(p2xss, p2yss, p2ydj - p2yss, p2xdj - p2xss), new Scalar(0, 255, 0));
-        Imgproc.rectangle(workingMatrix, new Rect(p3xss, p3yss, p3ydj - p3yss, p3xdj - p3xss), new Scalar(0, 0, 255));
-        */
         Imgproc.rectangle(workingMatrix, p1ss, p1dj, new Scalar(255, 0, 0), 4);
         Imgproc.rectangle(workingMatrix, p2ss, p2dj, new Scalar(0, 255, 0), 4);
         Imgproc.rectangle(workingMatrix, p3ss, p3dj, new Scalar(0, 0, 255), 4);
@@ -76,24 +67,7 @@ public class ImageDetector extends OpenCvPipeline {
         if(lastmax == firstT) position = "FIRST";
         else if(lastmax == secondT) position = "SECOND";
         else position = "THIRD";
-        //oneRingTotal = Core.sumElems(matOneRing).val[2];
 
-        //fourRingsTotal = Core.sumElems(matFourRings).val[2];
-/*
-       double thresholdOne = 62500, thresholdFour = 135000; //old thresholdFour = 130000
-       if(fourRingsTotal < thresholdFour) count = "FOUR";
-       else if(oneRingTotal < thresholdOne) count = "ONE";
-       else count = "ZERO";
-       /*if(oneRingTotal < thresholdOne)
-       {
-           if(fourRingsTotal < thresholdFour)
-           {
-               count = "FOUR";
-           }
-           else
-               count = "ONE";
-       } else count = "ZERO";
- */
         return workingMatrix;
     }
     public String getPosition()

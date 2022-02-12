@@ -40,9 +40,9 @@ public class UsefulFunctions extends LinearOpMode {
     public static double robotSizeRatio = 34.5 / 26; //lungime / latime
 
     public static double gearRatioOffset = 32/20; ///32 dde dinti pe 20 de dinti pentru ca un servo avea dinti diferite (servo dreapta rampa)
-    public static int trafaletPozJos = 100;
+    public static int trafaletPozJos = 80;
 
-    public double unghiNivelJos =  90, unghiNivelMij = 45, unghiNivelSus = 30;
+    public double unghiNivelJos = 75, unghiNivelMij = 87.5, unghiNivelSus = 105;
     public double unghiuriRampa[] = {unghiNivelJos, unghiNivelMij, unghiNivelSus};
     public static int rampaState = 0; /// 0 - JOS, 1 - MIJLOC, 2 - SUS
 
@@ -88,8 +88,8 @@ public class UsefulFunctions extends LinearOpMode {
         rampaServoStanga.setDirection(Servo.Direction.FORWARD);
         rampaServoDreapta.setDirection(Servo.Direction.REVERSE);
 
-        trafaletServoDreapta.setPosition(0);
-        trafaletServoStanga.setPosition(0);
+        trafaletServoDreapta.setPosition(90/180);
+        trafaletServoStanga.setPosition(90/180);
         rampaServoDreapta.setPosition(0.5);
         rampaServoStanga.setPosition(0.5);
         trafaletAngle = 0;
@@ -129,9 +129,9 @@ public class UsefulFunctions extends LinearOpMode {
         UpdateTicks();
         int trgtfl, trgtfr, trgtbl, trgtbr;
         trgtfl = crticksfl + ticksToMove;
-        trgtfr = crticksfr - sideOrFront * ticksToMove;
+        trgtfr = crticksfr - ticksToMove;
         trgtbl = crticksbl + sideOrFront * ticksToMove;
-        trgtbr = crticksbr - ticksToMove;
+        trgtbr = crticksbr - sideOrFront * ticksToMove;
 
         SwitchMotorModes(DcMotor.RunMode.RUN_USING_ENCODER);
         frontleft.setTargetPosition(trgtfl);
@@ -151,10 +151,10 @@ public class UsefulFunctions extends LinearOpMode {
             telemetry.addData("br", crticksbr +" "+ trgtbr);
             telemetry.update();
         }
-        mv.applyPID(frontleft, crticksfl, trgtfl);
-        mv.applyPID(frontright, crticksfr, trgtfr);
-        mv.applyPID(backleft, crticksbl, trgtbl);
-        mv.applyPID(backright, crticksbr, trgtbr);
+//        mv.applyPID(frontleft, crticksfl, trgtfl);
+//        mv.applyPID(frontright, crticksfr, trgtfr);
+//        mv.applyPID(backleft, crticksbl, trgtbl);
+//        mv.applyPID(backright, crticksbr, trgtbr);
 
         ApplyMotorValues(new MotorValues(0));
         UpdateTicks();
@@ -168,7 +168,7 @@ public class UsefulFunctions extends LinearOpMode {
         while(gyro.getAngularOrientation().firstAngle != angle)
         {
             int sign = angle - crtAngle > 0 ? -1 : 1;
-            ApplyMotorValues(new MotorValues(sign));
+            ApplyMotorValues(new MotorValues(sign, -sign, sign, -sign, 0.5));
             sleep(50);
             UpdateOrientation();
             UpdateTicks();
@@ -185,10 +185,10 @@ public class UsefulFunctions extends LinearOpMode {
         double y = gamepad1.left_stick_y;
         double rotation = gamepad1.right_stick_x;
 
-        double power_fl = x - y + rotation;
-        double power_fr = x + y + rotation;
-        double power_bl = - x - y + rotation;
-        double power_br = - x +  y + rotation;
+        double power_fl = x + y - rotation;
+        double power_fr = - x - y - rotation;
+        double power_bl = - x + y - rotation;
+        double power_br = x - y - rotation;
 
         MotorValues motorValues = new MotorValues(power_fl, power_fr, power_bl, power_br, 0.5);
         if (gamepad1.left_bumper) motorValues.SlowMode();
@@ -254,7 +254,7 @@ public class UsefulFunctions extends LinearOpMode {
             @Override
             public void onOpened()
             {
-                webcam.startStreaming(1280, 720, OpenCvCameraRotation.UPRIGHT);
+                webcam.startStreaming(1280, 720, OpenCvCameraRotation.UPSIDE_DOWN);
             }
 
             @Override
@@ -286,6 +286,13 @@ public class UsefulFunctions extends LinearOpMode {
         else return;
 
         addToRampaAngle(-rampaAngle + unghiuriRampa[rampaState]);
+    }
+
+    public void motorRampaOnOff()
+    {
+        mergeRampa = !mergeRampa;
+        rampaMotorDreapta.setPower(mergeRampa ? 1 : 0);
+        rampaMotorStanga.setPower(mergeRampa ? 1 : 0);
     }
 
     @Override

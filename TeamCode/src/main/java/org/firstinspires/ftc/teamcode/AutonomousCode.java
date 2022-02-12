@@ -53,10 +53,9 @@ public class AutonomousCode extends UsefulFunctions {
         sleep(500);
         position = pipeline.getPosition();
         StopVision();
-
-        AutonomousMove(-in_to_mm(24), 0);
+        AutonomousMove(0, in_to_mm(24));
         sleep(2000);
-        AutonomousMove(0, -in_to_mm(24));
+        AutonomousMove(-in_to_mm(12), 0);
         sleep(2000);
 
         if(position == "FIRST") {
@@ -66,9 +65,19 @@ public class AutonomousCode extends UsefulFunctions {
         } else if(position == "THIRD") {
             addToRampaAngle(-rampaAngle + unghiNivelSus);
         }
-        sleep(2000);
+        sleep(1000);
+//        motorRampaOnOff();
+//        sleep(5000);
+//        motorRampaOnOff();
 
-        AutonomousRotate(90);
+        AutonomousRotate(120);
+        sleep(500);
+        AutonomousMove(-in_to_mm(36), 0);
+        sleep(500);
+
+//        motorRampaOnOff();
+//        sleep(5000);
+//        motorRampaOnOff();
 
         while (opModeIsActive()) {
             telemetry.addData("Status", "Run Time: " + runtime.toString());

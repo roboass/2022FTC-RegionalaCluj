@@ -63,7 +63,7 @@ public class TeleOpCode extends UsefulFunctions {
 
             telemetry.addData("Status", "Run Time: " + runtime.toString());
 
-            if(gamepad1.right_trigger > 0.9) {
+            if(gamepad1.right_trigger > 0.5) {
                 trafaletMotor.setPower(10);
             } else {
                 trafaletMotor.setPower(0);
@@ -72,9 +72,7 @@ public class TeleOpCode extends UsefulFunctions {
 
             if(gamepad2.right_bumper) {
                 if(!rbumper2) {
-                    mergeRampa = !mergeRampa;
-                    rampaMotorDreapta.setPower(mergeRampa ? 1 : 0);
-                    rampaMotorStanga.setPower(mergeRampa ? 1 : 0);
+                    motorRampaOnOff();
                     rbumper2 = true;
                 }
             } else if(rbumper2) {
@@ -83,7 +81,7 @@ public class TeleOpCode extends UsefulFunctions {
 
             if(gamepad1.y) {
                 if(!yLock) {
-                    addToTrafaletAngle(-2.5);
+                    addToTrafaletAngle(-5);
                     yLock = true;
                 }
             } else if(yLock) {
@@ -92,7 +90,7 @@ public class TeleOpCode extends UsefulFunctions {
 
             if(gamepad1.a) {
                 if(!aLock) {
-                    addToTrafaletAngle(2.5);
+                    addToTrafaletAngle(5);
                     aLock = true;
                 }
             } else if(aLock) aLock = false;
@@ -123,7 +121,7 @@ public class TeleOpCode extends UsefulFunctions {
             if(gamepad2.dpad_right) {
                 if(!dright)
                 {
-                    addToRampaAngle(5);
+                    addToRampaAngle(-5);
                     dright = true;
                 }
             } else if(dright) dright = false;
@@ -131,7 +129,7 @@ public class TeleOpCode extends UsefulFunctions {
             if(gamepad2.dpad_left) {
                 if(!dleft)
                 {
-                    addToRampaAngle(-5);
+                    addToRampaAngle(5);
                     dleft = true;
                 }
             } else if(dleft) dleft = false;
