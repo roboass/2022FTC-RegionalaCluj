@@ -42,7 +42,7 @@ public class UsefulFunctions extends LinearOpMode {
     public static double gearRatioOffset = 32/20; ///32 dde dinti pe 20 de dinti pentru ca un servo avea dinti diferite (servo dreapta rampa)
     public static int trafaletPozJos = 80;
 
-    public double unghiNivelJos = 75, unghiNivelMij = 87.5, unghiNivelSus = 105;
+    public double unghiNivelJos = 82.5, unghiNivelMij = 97.5, unghiNivelSus = 110, unghiCarousel = 100;
     public double unghiuriRampa[] = {unghiNivelJos, unghiNivelMij, unghiNivelSus};
     public static int rampaState = 0; /// 0 - JOS, 1 - MIJLOC, 2 - SUS
 
@@ -81,17 +81,12 @@ public class UsefulFunctions extends LinearOpMode {
         backright.setDirection(DcMotorSimple.Direction.FORWARD);
         trafaletMotor.setDirection(DcMotorSimple.Direction.FORWARD);
         rampaMotorDreapta.setDirection(DcMotorSimple.Direction.FORWARD);
-        rampaMotorStanga.setDirection(DcMotorSimple.Direction.REVERSE);
+        rampaMotorStanga.setDirection(DcMotorSimple.Direction.FORWARD);
 
         trafaletServoStanga.setDirection(Servo.Direction.REVERSE);
         trafaletServoDreapta.setDirection(Servo.Direction.FORWARD);
         rampaServoStanga.setDirection(Servo.Direction.FORWARD);
         rampaServoDreapta.setDirection(Servo.Direction.REVERSE);
-
-        trafaletServoDreapta.setPosition(90/180);
-        trafaletServoStanga.setPosition(90/180);
-        rampaServoDreapta.setPosition(0.5);
-        rampaServoStanga.setPosition(0.5);
         trafaletAngle = 0;
         rampaAngle = 90;
 
@@ -162,16 +157,30 @@ public class UsefulFunctions extends LinearOpMode {
     }
 
     public void AutonomousRotate(double angle) {
-        MotorValues mv = new MotorValues(1);
+
+        SwitchMotorModes(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        ApplyMotorValues(new MotorValues(0));
+        double maxAngleError = 6;
 
         double crtAngle = gyro.getAngularOrientation().firstAngle;
-        while(gyro.getAngularOrientation().firstAngle != angle)
+        double sign = angle - crtAngle;
+        MotorValues mv = new MotorValues(sign / Math.abs(sign) * 0.51);
+        mv.NormaliseValues();
+        ApplyMotorValues(mv);
+
+        while(Math.abs(crtAngle - angle) >= maxAngleError)
         {
-            int sign = angle - crtAngle > 0 ? -1 : 1;
-            ApplyMotorValues(new MotorValues(sign, -sign, sign, -sign, 0.5));
-            sleep(50);
+            telemetry.addData("current angle", crtAngle);
+            telemetry.addData("angle error", Math.abs(crtAngle - angle));
+            telemetry.addData("sign", sign);
+            telemetry.update();
+
+            mv.NormaliseValues();
+            ApplyMotorValues(mv);
+
             UpdateOrientation();
             UpdateTicks();
+            crtAngle = gyro.getAngularOrientation().firstAngle;
         }
         ApplyMotorValues(new MotorValues(0));
         UpdateOrientation();
@@ -181,6 +190,7 @@ public class UsefulFunctions extends LinearOpMode {
     /*Functia care controleaza miscarea in TeleOp.
      * Citeste din gamepad1, nu are parametri*/
     public void TeleOpDrive() {
+        SwitchMotorModes(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         double x = gamepad1.left_stick_x;
         double y = gamepad1.left_stick_y;
         double rotation = gamepad1.right_stick_x;

@@ -33,6 +33,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
@@ -55,7 +56,7 @@ public class TeleOpCode extends UsefulFunctions {
         waitForStart();
         runtime.reset();
 
-        boolean xLock = false, bLock = false, yLock = false, aLock = false, dupLock = false, ddownLock = false,
+        boolean a2lock = false, bLock = false, yLock = false, aLock = false, dupLock = false, ddownLock = false,
                 dleft = false, dright = false, rbumper2 = false;
 
         while (opModeIsActive()) {
@@ -69,6 +70,13 @@ public class TeleOpCode extends UsefulFunctions {
                 trafaletMotor.setPower(0);
             }
 
+            if(gamepad2.right_trigger > 0.5) {
+                //rampaMotorDreapta.setDirection(DcMotorSimple.Direction.REVERSE);
+                rampaMotorDreapta.setPower(-1);
+            } else if(rampaMotorDreapta.getPower() < 0) {
+                //rampaMotorDreapta.setDirection(DcMotorSimple.Direction.FORWARD);
+                rampaMotorDreapta.setPower(1);
+            }
 
             if(gamepad2.right_bumper) {
                 if(!rbumper2) {
@@ -105,7 +113,7 @@ public class TeleOpCode extends UsefulFunctions {
             if(gamepad2.dpad_up) {
                 if(!dupLock)
                 {
-                    changeRampaState(-1);
+                    changeRampaState(1);
                     dupLock = true;
                 }
             } else if(dupLock) dupLock = false;
@@ -113,7 +121,7 @@ public class TeleOpCode extends UsefulFunctions {
             if(gamepad2.dpad_down) {
                 if(!ddownLock)
                 {
-                    changeRampaState(1);
+                    changeRampaState(-1);
                     ddownLock = true;
                 }
             } else if(ddownLock) ddownLock = false;
@@ -133,6 +141,14 @@ public class TeleOpCode extends UsefulFunctions {
                     dleft = true;
                 }
             } else if(dleft) dleft = false;
+
+            if(gamepad2.a) {
+                if(!a2lock)
+                {
+                    addToRampaAngle(-rampaAngle + unghiCarousel);
+                    a2lock = true;
+                }
+            } else if(a2lock) a2lock = false;
 
             UpdateTicks();
             UpdateOrientation();

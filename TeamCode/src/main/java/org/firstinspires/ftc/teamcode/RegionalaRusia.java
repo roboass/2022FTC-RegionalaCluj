@@ -30,6 +30,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 @Autonomous(name="RegionalaRusia", group="Linear Opmode")
@@ -44,12 +45,57 @@ public class RegionalaRusia extends UsefulFunctions {
         telemetry.update();
 
         Initialise();
+        InitialiseVision();
 
         waitForStart();
         runtime.reset();
 
+        sleep(500);
+        position = pipeline.getPosition();
+        telemetry.addData("pos", position);
+        telemetry.update();
+        StopVision();
+
+        rampaServoDreapta.setPosition(0.5);
+        rampaServoStanga.setPosition(0.5);
+
+        AutonomousMove(-in_to_mm(2), 0);
+        trafaletServoDreapta.setPosition(-trafaletAngle + trafaletPozJos);
+        trafaletServoStanga.setPosition(-trafaletAngle + trafaletPozJos);
+
+
+        sleep(200);
+
+        if(position == "FIRST") {
+            addToRampaAngle(-rampaAngle + unghiNivelJos);
+        } else if(position == "SECOND") {
+            addToRampaAngle(-rampaAngle + unghiNivelMij);
+        } else if(position == "THIRD") {
+            addToRampaAngle(-rampaAngle + unghiNivelSus);
+        }
+        sleep(200);
+
         AutonomousMove(0, in_to_mm(24));
-        AutonomousMove(-in_to_mm(24), 0);
+        sleep(200);
+        AutonomousMove(-in_to_mm(11), 0);
+        sleep(200);
+
+        motorRampaOnOff();
+        sleep(8000);
+        motorRampaOnOff();
+
+        telemetry.addData("angle", gyro.getAngularOrientation().firstAngle);
+        telemetry.update();
+        sleep(100);
+
+        AutonomousRotate(-100);
+        telemetry.addData("angle", gyro.getAngularOrientation().firstAngle);
+        telemetry.update();
+
+        sleep(200);
+        AutonomousMove(0, in_to_mm(13.5));
+        sleep(200);
+        AutonomousMove(-in_to_mm(3.27 * 24), 0);
 
         while (opModeIsActive()) {
             telemetry.addData("Status", "Run Time: " + runtime.toString());

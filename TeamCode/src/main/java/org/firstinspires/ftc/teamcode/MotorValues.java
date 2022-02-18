@@ -9,9 +9,9 @@ import java.util.HashMap;
 public class MotorValues {
     public double fl, fr, bl, br, globalMultiplier = 0.5;
 
-    public double P = 3, I = 8, D = 1.75, ImaxOutput; ///17, 100, 5 creste d
-    public double lastActual, actual, lastOutput, output, errorSum = 0;
-    public double minOutput = 0, maxOutput = 0, outputRampRate = 5, maxError = 1000, outputFilter = 5;
+    public static double P = 2.5, I = 5.5, D = 8; 
+    public double lastActual, actual, lastOutput, output, errorSum = 0, ImaxOutput;
+    public double minOutput = 0, maxOutput = 0, outputRampRate = 5, maxError = 250, outputFilter = 5;
     public boolean reversed = false, firstrun = true;
 
     public double slowModeMultiplier = 0.5;

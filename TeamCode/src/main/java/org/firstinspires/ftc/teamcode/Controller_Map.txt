@@ -12,3 +12,4 @@ GAMEPAD2
     sageata stanga - ridica cu 5 grade rampa
     sageata dreapta - coboara cu 5 grade rampa
     right bumper - porneste motoarele de la rampa
+    a - pune rampa la nivelul caruselului

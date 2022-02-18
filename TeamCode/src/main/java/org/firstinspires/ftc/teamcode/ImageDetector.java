@@ -19,10 +19,10 @@ public class ImageDetector extends OpenCvPipeline {
     public static double firstT, secondT, thirdT;
     public int rows = 720, cols = 1080;
 
-    int HEIGHT = 150, WIDTH = 150;
-    Point p1ss = new Point(0  , 400),
-          p2ss = new Point(400, 400),
-          p3ss = new Point(800, 400);
+    int HEIGHT = 100, WIDTH = 100;
+    Point p1ss = new Point(0  , 200),
+          p2ss = new Point(650, 200),
+          p3ss = new Point(1180, 200);
 
 
     Point p1dj = new Point(p1ss.x + HEIGHT, p1ss.y + WIDTH),
