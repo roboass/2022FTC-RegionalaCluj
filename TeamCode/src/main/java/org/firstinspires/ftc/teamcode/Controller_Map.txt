@@ -2,10 +2,6 @@ GAMEPAD1
     left stick - movement
     right stick - rotation
     left bumper - slow mode
-    right trigger - motor trafalet
-    y - ridica trafaletul
-    a - coboara trafaletul
-    b - seteaza trafaletul la un unghi fix
 GAMEPAD2
     sageata sus - ridica rampa intre cele 3 pozitii fixe
     sageata jos - coboara rampa intre cele 3 pozitii fixe

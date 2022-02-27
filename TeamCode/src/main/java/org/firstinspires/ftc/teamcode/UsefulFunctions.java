@@ -21,13 +21,14 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 
 public class UsefulFunctions extends LinearOpMode {
     public DcMotor frontleft, frontright, backleft, backright;
-    public DcMotor trafaletMotor; //zaiafet
     public DcMotor rampaMotorDreapta, rampaMotorStanga;
-    public DcMotor duckMotor;
-    public Servo platformaServo;
-    public Servo trafaletServoStanga, trafaletServoDreapta, rampaServoStanga, rampaServoDreapta, servoTragator;
+
+//    public Servo trafaletServoStanga, trafaletServoDreapta;
+//    public DcMotor trafaletMotor; //zaiafet
+
+    public Servo rampaServoStanga, rampaServoDreapta;
     public double trafaletAngle, rampaAngle;
-    //public Servo launchServo, liftClawServo1, liftClawServo2, grabClawServo1, grabClawServo2, angleLaunchServo1, angleLaunchServo2;
+//    public Servo launchServo, liftClawServo1, liftClawServo2, grabClawServo1, grabClawServo2, angleLaunchServo1, angleLaunchServo2;
 //    public OpenCvCamera phoneCam;
 
     OpenCvCamera webcam;
@@ -58,15 +59,14 @@ public class UsefulFunctions extends LinearOpMode {
         frontright = hardwareMap.get(DcMotor.class, "front_right");
         backleft = hardwareMap.get(DcMotor.class, "back_left");
         backright = hardwareMap.get(DcMotor.class, "back_right");
-        trafaletMotor = hardwareMap.get(DcMotor.class, "trafalet");
         rampaMotorDreapta = hardwareMap.get(DcMotor.class, "r_m_d");
         rampaMotorStanga = hardwareMap.get(DcMotor.class, "r_m_s");
 
-        trafaletServoStanga = hardwareMap.get(Servo.class, "trafalet_servo_st");
-        trafaletServoDreapta = hardwareMap.get(Servo.class, "trafalet_servo_dr");
+        // trafaletMotor = hardwareMap.get(DcMotor.class, "trafalet");
+        // trafaletServoStanga = hardwareMap.get(Servo.class, "trafalet_servo_st");
+        // trafaletServoDreapta = hardwareMap.get(Servo.class, "trafalet_servo_dr");
         rampaServoStanga = hardwareMap.get(Servo.class, "rampa_servo_st");
         rampaServoDreapta = hardwareMap.get(Servo.class, "rampa_servo_dr");
-        servoTragator = hardwareMap.get(Servo.class, "tragator");
 
         SwitchMotorModes(DcMotor.RunMode.RUN_USING_ENCODER);
 
@@ -79,15 +79,16 @@ public class UsefulFunctions extends LinearOpMode {
         frontright.setDirection(DcMotorSimple.Direction.FORWARD);
         backleft.setDirection(DcMotorSimple.Direction.FORWARD);
         backright.setDirection(DcMotorSimple.Direction.FORWARD);
-        trafaletMotor.setDirection(DcMotorSimple.Direction.FORWARD);
         rampaMotorDreapta.setDirection(DcMotorSimple.Direction.FORWARD);
         rampaMotorStanga.setDirection(DcMotorSimple.Direction.FORWARD);
 
-        trafaletServoStanga.setDirection(Servo.Direction.REVERSE);
-        trafaletServoDreapta.setDirection(Servo.Direction.FORWARD);
+//        trafaletMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+//        trafaletServoStanga.setDirection(Servo.Direction.REVERSE);
+//        trafaletServoDreapta.setDirection(Servo.Direction.FORWARD);
+//        trafaletAngle = 0;
+
         rampaServoStanga.setDirection(Servo.Direction.FORWARD);
         rampaServoDreapta.setDirection(Servo.Direction.REVERSE);
-        trafaletAngle = 0;
         rampaAngle = 90;
 
         //Partea drepta mere in fata
@@ -146,10 +147,10 @@ public class UsefulFunctions extends LinearOpMode {
             telemetry.addData("br", crticksbr +" "+ trgtbr);
             telemetry.update();
         }
-//        mv.applyPID(frontleft, crticksfl, trgtfl);
-//        mv.applyPID(frontright, crticksfr, trgtfr);
-//        mv.applyPID(backleft, crticksbl, trgtbl);
-//        mv.applyPID(backright, crticksbr, trgtbr);
+        mv.applyPID(frontleft, crticksfl, trgtfl);
+        mv.applyPID(frontright, crticksfr, trgtfr);
+        mv.applyPID(backleft, crticksbl, trgtbl);
+        mv.applyPID(backright, crticksbr, trgtbr);
 
         ApplyMotorValues(new MotorValues(0));
         UpdateTicks();
@@ -276,12 +277,12 @@ public class UsefulFunctions extends LinearOpMode {
         webcam.stopStreaming();
     }
 
-    public void addToTrafaletAngle(double angle)
-    {
-        trafaletAngle += angle;
-        trafaletServoStanga.setPosition(trafaletAngle/180);
-        trafaletServoDreapta.setPosition(trafaletAngle/180);
-    }
+//    public void addToTrafaletAngle(double angle)
+//    {
+//        trafaletAngle += angle;
+//        trafaletServoStanga.setPosition(trafaletAngle/180);
+//        trafaletServoDreapta.setPosition(trafaletAngle/180);
+//    }
 
     public void addToRampaAngle(double angle)
     {

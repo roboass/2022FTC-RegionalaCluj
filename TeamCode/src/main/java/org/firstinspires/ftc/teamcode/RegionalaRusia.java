@@ -60,8 +60,8 @@ public class RegionalaRusia extends UsefulFunctions {
         rampaServoStanga.setPosition(0.5);
 
         AutonomousMove(-in_to_mm(2), 0);
-        trafaletServoDreapta.setPosition(-trafaletAngle + trafaletPozJos);
-        trafaletServoStanga.setPosition(-trafaletAngle + trafaletPozJos);
+//        trafaletServoDreapta.setPosition(-trafaletAngle + trafaletPozJos);
+//        trafaletServoStanga.setPosition(-trafaletAngle + trafaletPozJos);
 
 
         sleep(200);
@@ -75,27 +75,35 @@ public class RegionalaRusia extends UsefulFunctions {
         }
         sleep(200);
 
-        AutonomousMove(0, in_to_mm(24));
-        sleep(200);
-        AutonomousMove(-in_to_mm(11), 0);
-        sleep(200);
+//        AutonomousMove(0, in_to_mm(24));
+//        sleep(200);
+//        AutonomousMove(-in_to_mm(11), 0);
+//        sleep(200);
 
-        motorRampaOnOff();
-        sleep(8000);
-        motorRampaOnOff();
+//        motorRampaOnOff();
+//        sleep(8000);
+//        motorRampaOnOff();
 
         telemetry.addData("angle", gyro.getAngularOrientation().firstAngle);
         telemetry.update();
         sleep(100);
 
-        AutonomousRotate(-100);
+        AutonomousRotate(-90);
         telemetry.addData("angle", gyro.getAngularOrientation().firstAngle);
         telemetry.update();
 
+//        sleep(200);
+//        AutonomousMove(0, in_to_mm(15.5));
+//        sleep(200);
+//        AutonomousMove(-in_to_mm(3.27 * 24), 0);
+
+        AutonomousMove(0, in_to_mm(1.5));
+        sleep(500);
+        AutonomousMove(-in_to_mm(5 * 24), 0);
         sleep(200);
-        AutonomousMove(0, in_to_mm(13.5));
-        sleep(200);
-        AutonomousMove(-in_to_mm(3.27 * 24), 0);
+        AutonomousMove(0, -in_to_mm(1.5));
+//        sleep(200);
+//        AutonomousMove(in_to_mm(24), 0);
 
         while (opModeIsActive()) {
             telemetry.addData("Status", "Run Time: " + runtime.toString());

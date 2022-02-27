@@ -57,20 +57,22 @@ public class TeleOpCode extends UsefulFunctions {
         runtime.reset();
 
         boolean a2lock = false, bLock = false, yLock = false, aLock = false, dupLock = false, ddownLock = false,
-                dleft = false, dright = false, rbumper2 = false;
+                dleft = false, dright = false, rbumper2 = false, xLock2 = false;
 
         while (opModeIsActive()) {
             TeleOpDrive();
 
             telemetry.addData("Status", "Run Time: " + runtime.toString());
 
-            if(gamepad1.right_trigger > 0.5) {
+            /*
+            if(gamepad2.right_trigger > 0.5) {
                 trafaletMotor.setPower(10);
             } else {
                 trafaletMotor.setPower(0);
             }
+            */
 
-            if(gamepad2.right_trigger > 0.5) {
+            if(gamepad2.left_trigger > 0.5) {
                 //rampaMotorDreapta.setDirection(DcMotorSimple.Direction.REVERSE);
                 rampaMotorDreapta.setPower(-1);
             } else if(rampaMotorDreapta.getPower() < 0) {
@@ -86,8 +88,8 @@ public class TeleOpCode extends UsefulFunctions {
             } else if(rbumper2) {
                 rbumper2 = false;
             }
-
-            if(gamepad1.y) {
+/*
+            if(gamepad2.y) {
                 if(!yLock) {
                     addToTrafaletAngle(-5);
                     yLock = true;
@@ -96,20 +98,20 @@ public class TeleOpCode extends UsefulFunctions {
                 yLock = false;
             }
 
-            if(gamepad1.a) {
-                if(!aLock) {
+            if(gamepad2.x) {
+                if(!xLock2) {
                     addToTrafaletAngle(5);
-                    aLock = true;
+                    xLock2 = true;
                 }
-            } else if(aLock) aLock = false;
+            } else if(xLock2) xLock2 = false;
 
-            if(gamepad1.b) {
+            if(gamepad2.b) {
                 if(!bLock) {
                     addToTrafaletAngle(-trafaletAngle + trafaletPozJos);
                     bLock = true;
                 }
             } else if(bLock) bLock = false;
-
+ */
             if(gamepad2.dpad_up) {
                 if(!dupLock)
                 {
