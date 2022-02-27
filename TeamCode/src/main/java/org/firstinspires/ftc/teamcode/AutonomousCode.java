@@ -56,8 +56,8 @@ public class AutonomousCode extends UsefulFunctions {
         telemetry.update();
         StopVision();
 
-        trafaletServoDreapta.setPosition(90/180);
-        trafaletServoStanga.setPosition(90/180);
+//        trafaletServoDreapta.setPosition(90/180);
+//        trafaletServoStanga.setPosition(90/180);
         rampaServoDreapta.setPosition(0.5);
         rampaServoStanga.setPosition(0.5);
 
@@ -67,6 +67,7 @@ public class AutonomousCode extends UsefulFunctions {
             addToRampaAngle(-rampaAngle + unghiNivelJos);
         } else if(position == "SECOND") {
             addToRampaAngle(-rampaAngle + unghiNivelMij);
+            
         } else if(position == "THIRD") {
             addToRampaAngle(-rampaAngle + unghiNivelSus);
         }
