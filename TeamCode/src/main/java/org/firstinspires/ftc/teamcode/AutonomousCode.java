@@ -67,7 +67,7 @@ public class AutonomousCode extends UsefulFunctions {
             addToRampaAngle(-rampaAngle + unghiNivelJos);
         } else if(position == "SECOND") {
             addToRampaAngle(-rampaAngle + unghiNivelMij);
-            
+
         } else if(position == "THIRD") {
             addToRampaAngle(-rampaAngle + unghiNivelSus);
         }
